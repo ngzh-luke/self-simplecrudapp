@@ -2,7 +2,37 @@ const dotenv = require("dotenv");
 const express = require("express");
 const path = require("path");
 dotenv.config();
-// const mysql = require("psql");
+const mysql = require("mysql2");
+const Pool = require("pg").Pool;
+const pool1 = new Pool({
+  // url: process.env._URL,
+  host: process.env.PSQL_HOST,
+  database: process.env.PSQL_DATABASE,
+  user: process.env.PSQL_USER,
+  password: process.env.PSQL_PASSWORD,
+  port: process.env.PSQL_PORT,
+});
+
+pool1.connect(function (err) {
+  if (err) throw err;
+  console.log(`PSQL DB '${process.env.MYSQL_DATABASE}' successfully connect`);
+});
+
+// create connection for db
+const conn = mysql.createConnection({
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USERNAME,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  port: process.env.MYSQL_PORT,
+});
+
+// start connection to db
+conn.connect(function (err) {
+  if (err) throw err;
+  console.log(`mySQL DB '${process.env.MYSQL_DATABASE}' successfully connect`);
+});
+
 const port = process.env.PORT;
 
 const app = express(); // use app
@@ -12,7 +42,7 @@ router.use(express.json()); // parses incoming requests with JSON payloads and i
 router.use(express.urlencoded({ extended: true })); // parses incoming requests with urlencoded payloads
 app.use("/", router); // use middleware of the given routing path
 
-app.use(express.static(__dirname + "/static")); // using css and js
+router.use(express.static(__dirname + "/static")); // using css and js
 
 // get current timestamp
 function getTimestampInSeconds() {
@@ -21,11 +51,57 @@ function getTimestampInSeconds() {
 
 // `root` module route at '/' (get method)
 router.get("/", function (req, res) {
-  console.log("");
+  console.log(`${req.url}`);
   console.log(
     `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
   );
   res.sendFile(path.join(`${__dirname}` + `/index.html`));
+});
+
+router.get("/mysql/view", (req, res) => {
+  console.log(`${req.url}`);
+  console.log(
+    `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
+  );
+  let sql = "select * from accounts";
+  conn.query(sql, function (error, results) {
+    error
+      ? res.sendStatus(503)
+      : console.log(
+          "mysql command execute success\n" +
+            `${results.length} row(s) returned`
+        ); // if not found redirect, else, log
+
+    return res.send(results); // return result
+  });
+});
+
+router.get("/psql/view", (req, res) => {
+  console.log(`${req.url}`);
+  console.log(
+    `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
+  );
+  let sql = "select * from accounts";
+  pool1.query(sql, function (error, results) {
+    error
+      ? res.sendStatus(503)
+      : console.log(
+          "psql command execute success\n" + `${results.length} row(s) returned`
+        ); // if not found redirect, else, log
+
+    return res.send(results); // return result
+  });
+});
+
+/* Handle other unspecified paths */
+router.use((req, res, next) => {
+  console.log("");
+  console.log(
+    `404: Invalid accessed at URL: '${req.url}' ` +
+      "requested at " +
+      getTimestampInSeconds()
+  );
+  res.sendStatus(404);
 });
 
 // Server listening
