@@ -4,7 +4,7 @@ const path = require("path");
 dotenv.config();
 const mysql = require("mysql2");
 const Pool = require("pg").Pool;
-const pool1 = new Pool({
+const psql = new Pool({
   // url: process.env._URL,
   host: process.env.PSQL_HOST,
   database: process.env.PSQL_DATABASE,
@@ -13,13 +13,13 @@ const pool1 = new Pool({
   port: process.env.PSQL_PORT,
 });
 
-pool1.connect(function (err) {
-  if (err) throw err;
+psql.connect(function (err) {
+  if (err) throw console.log(err);
   console.log(`PSQL DB '${process.env.MYSQL_DATABASE}' successfully connect`);
 });
 
 // create connection for db
-const conn = mysql.createConnection({
+const msql = mysql.createConnection({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USERNAME,
   password: process.env.MYSQL_PASSWORD,
@@ -28,8 +28,8 @@ const conn = mysql.createConnection({
 });
 
 // start connection to db
-conn.connect(function (err) {
-  if (err) throw err;
+msql.connect(function (err) {
+  if (err) throw console.log(err);
   console.log(`mySQL DB '${process.env.MYSQL_DATABASE}' successfully connect`);
 });
 
@@ -64,7 +64,7 @@ router.get("/mysql/view", (req, res) => {
     `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
   );
   let sql = "select * from accounts";
-  conn.query(sql, function (error, results) {
+  msql.query(sql, function (error, results) {
     error
       ? res.sendStatus(503)
       : console.log(
@@ -82,7 +82,7 @@ router.get("/psql/view", (req, res) => {
     `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
   );
   let sql = "select * from accounts";
-  pool1.query(sql, function (error, results) {
+  psql.query(sql, function (error, results) {
     error
       ? res.sendStatus(503)
       : console.log(
