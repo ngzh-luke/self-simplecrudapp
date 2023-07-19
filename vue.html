@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Vue</title>
+    <script src="https://unpkg.com/vue@3.3.4/dist/vue.global.prod.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      {{ message }}
+      <a v-on:click="doSomething">click</a>
+      <br />
+      {{msg}}
+    </div>
+  </body>
+  <script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+      setup() {
+        const message = ref("Hello vue!");
+        let n = 1;
+        let msg = "";
+        function doSomething() {
+          return n++;
+        }
+        return {
+          message,
+          msg,
+          doSomething,
+        };
+      },
+    }).mount("#app");
+  </script>
+</html>

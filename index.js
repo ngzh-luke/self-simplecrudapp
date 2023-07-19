@@ -50,12 +50,21 @@ function getTimestampInSeconds() {
 }
 
 // `root` module route at '/' (get method)
-router.get("/", function (req, res) {
+router.get("/index", function (req, res) {
   console.log(`${req.url}`);
   console.log(
     `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
   );
   res.sendFile(path.join(`${__dirname}` + `/index.html`));
+});
+
+// `root` module route at '/' (get method)
+router.get("/", function (req, res) {
+  console.log(`${req.url}`);
+  console.log(
+    `URL: '${req.originalUrl}' requested at ` + getTimestampInSeconds()
+  );
+  res.sendFile(path.join(`${__dirname}` + `/vue.html`));
 });
 
 router.get("/mysql/view", (req, res) => {
