@@ -14,7 +14,7 @@ const psql = new Pool({
 });
 
 psql.connect(function (err) {
-  if (err) throw console.log(err);
+  if (err) console.log(err);
   console.log(`PSQL DB '${process.env.MYSQL_DATABASE}' successfully connect`);
 });
 
@@ -29,7 +29,7 @@ const msql = mysql.createConnection({
 
 // start connection to db
 msql.connect(function (err) {
-  if (err) throw console.log(err);
+  if (err) console.log(err);
   console.log(`mySQL DB '${process.env.MYSQL_DATABASE}' successfully connect`);
 });
 
